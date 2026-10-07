@@ -2,11 +2,20 @@
   <div style="padding:16px">
     <h1>借还记录</h1>
     <h3>逾期</h3>
-    <div v-for="l in data.overdue" :key="'o'+l.id" class="item overdue">{{ l.title }} · {{ l.borrower }}</div>
+    <div v-for="l in data.overdue" :key="'o'+l.id" class="item overdue">
+      {{ l.title }} · 物主 {{ l.owner_signed || l.owner || '—' }} · {{ l.borrower }}
+      <div class="muted">应还 {{ l.due_date }}</div>
+    </div>
     <h3>在借</h3>
-    <div v-for="l in data.active" :key="'a'+l.id" class="item">{{ l.title }} · {{ l.borrower }}</div>
+    <div v-for="l in data.active" :key="'a'+l.id" class="item">
+      {{ l.title }} · 物主 {{ l.owner_signed || l.owner || '—' }} · {{ l.borrower }}
+      <div class="muted">应还 {{ l.due_date }}</div>
+    </div>
     <h3>已还</h3>
-    <div v-for="l in data.returned" :key="'r'+l.id" class="item">{{ l.title }} · {{ l.borrower }}</div>
+    <div v-for="l in data.returned" :key="'r'+l.id" class="item">
+      {{ l.title }} · 物主 {{ l.owner_signed || l.owner || '—' }} · {{ l.borrower }}
+      <div class="muted">应还 {{ l.due_date }}</div>
+    </div>
   </div>
 </template>
 <script setup>

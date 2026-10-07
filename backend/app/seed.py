@@ -11,7 +11,16 @@ def init_db():
       due_date TEXT, lent_at TEXT, returned_at TEXT
     );
     CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT);
+    CREATE TABLE IF NOT EXISTS owner_merges(
+      absorbed TEXT PRIMARY KEY, canonical TEXT NOT NULL, attribution TEXT NOT NULL, created_at TEXT NOT NULL
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS loans_one_active ON loans(item_id) WHERE status='active';
     """)
+    # Idempotent column migration for databases created before owner merges.
+    cols = {r["name"] for r in c.execute("PRAGMA table_info(loans)")}
+    if "owner_signed" not in cols:
+        c.execute("ALTER TABLE loans ADD COLUMN owner_signed TEXT")
+    c.execute("PRAGMA journal_mode=WAL")
     if c.execute("SELECT COUNT(*) c FROM items").fetchone()["c"] == 0:
         c.executemany("INSERT INTO items(title,owner,status,data_quality) VALUES (?,?,?,?)", [
             ("电钻", "老周", "available", "clean"),
@@ -24,5 +33,4 @@ def init_db():
             (4, "邻居甲", "active", "2020-06-01", "2020-05-01"),
         )
         c.execute("INSERT INTO settings(key,value) VALUES ('board_name','木色邻里板')")
-        c.commit()
     c.close()

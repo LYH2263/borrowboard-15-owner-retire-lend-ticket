@@ -20,11 +20,15 @@ import { ref, onMounted, provide } from 'vue'
 import { api } from './api'
 const counts = ref({})
 const board = ref({ available: [], active: [], overdue: [] })
-async function load() {
-  board.value = await api('/board')
+const filterOwner = ref('')
+async function load(owner = filterOwner.value) {
+  filterOwner.value = owner || ''
+  const q = owner ? '/board?owner=' + encodeURIComponent(owner) : '/board'
+  board.value = await api(q)
   counts.value = board.value.counts || {}
 }
 provide('board', board)
 provide('reloadBoard', load)
-onMounted(load)
+provide('filterOwner', filterOwner)
+onMounted(() => load(''))
 </script>
